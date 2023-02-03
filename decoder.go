@@ -14,6 +14,7 @@ type Decoder struct {
 	header     map[string]int
 	keyCheck   []string
 	Comma      rune
+	LazyQuotes bool
 	CheckError func(error) error
 }
 
@@ -112,6 +113,7 @@ func (d *Decoder) UnMarshal(reader *csv.Reader, bean interface{}) error {
 func (d *Decoder) UnMarshalBytes(body []byte, bean interface{}) error {
 	csvReader := csv.NewReader(bytes.NewReader(body))
 	csvReader.Comma = d.Comma
+	csvReader.LazyQuotes = d.LazyQuotes
 	return d.UnMarshal(csvReader, bean)
 }
 
@@ -124,6 +126,7 @@ func (d *Decoder) UnMarshalFile(path string, bean interface{}) error {
 	defer csvFile.Close()
 	csvReader := csv.NewReader(csvFile)
 	csvReader.Comma = d.Comma
+	csvReader.LazyQuotes = d.LazyQuotes
 	return d.UnMarshal(csvReader, bean)
 }
 
