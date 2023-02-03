@@ -85,11 +85,23 @@ func (d *Decoder) UnMarshal(reader *csv.Reader, bean interface{}) error {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			d.CheckError(err)
+			if d.CheckError != nil {
+				if err = d.CheckError(err); err != nil {
+					return err
+				}
+			} else {
+				continue
+			}
 		}
 		beanV, err := d.unMarshal(row, beanT)
 		if err != nil {
-			d.CheckError(err)
+			if d.CheckError != nil {
+				if err = d.CheckError(err); err != nil {
+					return err
+				}
+			} else {
+				continue
+			}
 		}
 
 		value.Set(reflect.Append(value, beanV))
