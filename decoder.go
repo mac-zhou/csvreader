@@ -11,9 +11,10 @@ import (
 )
 
 type Decoder struct {
-	header   map[string]int
-	keyCheck []string
-	Comma    rune
+	header     map[string]int
+	keyCheck   []string
+	Comma      rune
+	CheckError func(error) error
 }
 
 type CsvMarshal interface {
@@ -84,11 +85,11 @@ func (d *Decoder) UnMarshal(reader *csv.Reader, bean interface{}) error {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return err
+			d.CheckError(err)
 		}
 		beanV, err := d.unMarshal(row, beanT)
 		if err != nil {
-			return err
+			d.CheckError(err)
 		}
 
 		value.Set(reflect.Append(value, beanV))
@@ -98,6 +99,7 @@ func (d *Decoder) UnMarshal(reader *csv.Reader, bean interface{}) error {
 
 func (d *Decoder) UnMarshalBytes(body []byte, bean interface{}) error {
 	csvReader := csv.NewReader(bytes.NewReader(body))
+	csvReader.Comma = d.Comma
 	return d.UnMarshal(csvReader, bean)
 }
 
