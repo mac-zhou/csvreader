@@ -13,6 +13,7 @@ import (
 type Decoder struct {
 	header   map[string]int
 	keyCheck []string
+	Comma    rune
 }
 
 type CsvMarshal interface {
@@ -108,6 +109,7 @@ func (d *Decoder) UnMarshalFile(path string, bean interface{}) error {
 	}
 	defer csvFile.Close()
 	csvReader := csv.NewReader(csvFile)
+	csvReader.Comma = d.Comma
 	return d.UnMarshal(csvReader, bean)
 }
 
